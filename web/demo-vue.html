@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vue 实现 TodoList</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            background: cadetblue;
+        }
+        #app {
+            width: 500px;
+            margin: 1em auto;
+            background: antiquewhite;
+            padding: 1em;
+        }
+        input {
+            border: 0;
+            outline: 0;
+            border-bottom: 1px solid green;
+        }
+        input:hover {
+            border-bottom: 1px solid blue;
+        }
+        .task-todo, .task-done {
+            display: flex;
+        }
+        .task-todo p, .task-done div {
+            flex: 1;
+        }
+        button {
+            flex: 0 0 50px;
+            height: 45px;
+            border: 0;
+            outline: 0;
+            color: wheat;
+            background: linear-gradient(70deg, red, green, blue);
+            padding: 5px 10px;
+            margin-left: 1em;
+        }
+        button:hover {
+            background: linear-gradient(to right, greenyellow, blueviolet, yellowgreen);
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h3>任务列表 (todo-list)</h3>
+        </header>
+
+        <div>
+            <input v-model="srnr" @keydown.13="addTask" placeholder="请输入你的任务">
+        </div>
+
+        <div>
+            <h3>未完成任务</h3>
+            <div class="tasks-todo">
+                <div class="task-todo" v-for="task in tasksTodo">
+                    <p class="task-body">{{task.body}}</p>
+                    <button class="tesk-del" @click="delTodo(task.id)">删除按钮</button>
+                    <button class="task-arch" @click="archTodo(task.id)">归档按钮</button>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h3>已完成任务</h3>
+            <div class="tasks-done">
+                <div class="task-done" v-for="task in tasksDone">
+                    <p class="task-desc">{{task.body}}</p>
+                    <button class="tesk-del" @click="delDone(task.id)">删除按钮</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var options = {
+            el: "#app",
+            data: {
+                srnr: "",
+                tasksTodo: [],
+                tasksDone: []
+            },
+            methods: {
+                addTask: function () {
+                    var resp = new URLSearchParams();
+                    resp.append("body", this.srnr);
+
+                    axios({
+                        url: "task/add",
+                        method: "post",
+                        data: resp
+                    }).then(resp => {
+                        this.srnr = "";
+                        this.loadTasks();
+                    })
+                },
+
+                delTodo: function (id) {
+                    axios.get("task/delTodo?id=" + id)
+                    .then(resp => {
+                        this.loadTasks();
+                    })
+                },
+                archTodo: function (id) {
+                    axios.get("task/archive?id=" + id)
+                    .then(resp => {
+                        this.loadTasks();
+                    })
+                },
+                delDone: function (id) {
+                    axios.get("task/delDone?id=" + id)
+                    .then(resp => {
+                        this.loadTasks();
+                    })
+                },
+
+                loadTasks: function () {
+                    axios({
+                        url: "task/list"
+                    }).then(resp => {
+                        this.tasksTodo = resp.data.filter(e => e.state === 1);
+                        this.tasksDone = resp.data.filter(e => e.state === 2);
+                    })
+                }
+            },
+
+            created: function () {
+                this.loadTasks();
+            },
+            mounted: function () {
+                console.log("页面加载完成做的事")
+            }
+        };
+        var vm = new Vue(options);
+    </script>
+</body>
+</html>
