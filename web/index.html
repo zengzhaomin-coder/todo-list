@@ -82,7 +82,7 @@
         </h3>
     </section>
     <section>
-        <input class="add" placeholder="请输入您要做的事情">
+        <input class="add" placeholder="请输入您要做的事情" style="height: 35px">
     </section>
     <section class="todo">
         <header>未完成的任务</header>
@@ -137,6 +137,7 @@
                     });
                 });
             })
+        
             // 归档代码
             .on('click', '.finish', function (ev) {
                 var $btn = $(this);
@@ -149,7 +150,9 @@
                     });
                 });
             });
-        $(".done")  // 已完成任务的移除代码
+        
+        // 已完成任务移除代码
+        $(".done")  
             .on('click', '.del', function (ev) {
                 var $task = $(this).closest("p");
                 $.get("task/delDone?id=" + $task.data("id"), function () {
