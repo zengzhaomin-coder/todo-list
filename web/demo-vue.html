@@ -83,15 +83,14 @@
         var options = {
             el: "#app",
             data: {
-                srnr: "",
-                tasksTodo: [],
-                tasksDone: []
+                srnr: "",   // 要归档的任务
+                tasksTodo: [],  // 未完成的任务
+                tasksDone: []   // 已完成的任务
             },
             methods: {
                 addTask: function () {
                     var resp = new URLSearchParams();
                     resp.append("body", this.srnr);
-
                     axios({
                         url: "task/add",
                         method: "post",
@@ -102,18 +101,23 @@
                     })
                 },
 
+                // 移除未完成的任务
                 delTodo: function (id) {
                     axios.get("task/delTodo?id=" + id)
                     .then(resp => {
                         this.loadTasks();
                     })
                 },
+                
+                // 归档的操作 
                 archTodo: function (id) {
                     axios.get("task/archive?id=" + id)
                     .then(resp => {
                         this.loadTasks();
                     })
                 },
+                
+                // 移除已完成的任务
                 delDone: function (id) {
                     axios.get("task/delDone?id=" + id)
                     .then(resp => {
@@ -121,6 +125,7 @@
                     })
                 },
 
+                // 显示所有任务
                 loadTasks: function () {
                     axios({
                         url: "task/list"
@@ -130,7 +135,8 @@
                     })
                 }
             },
-
+            
+            // 第一步执行的操作
             created: function () {
                 this.loadTasks();
             },
